@@ -1,0 +1,148 @@
+{
+ "HVG": [
+  [
+   "VS2100",
+   "Honningsvåg (N)"
+  ],
+  [
+   "VS1522",
+   "Honningsvåg (S)"
+  ]
+ ],
+ "KJD": [
+  [
+   "VS1521",
+   "Kjøllefjord"
+  ]
+ ],
+ "HFT": [
+  [
+   "VS1002",
+   "Hammerfest (N)"
+  ],
+  [
+   "VS1001",
+   "Hammerfest (S)"
+  ]
+ ],
+ "VRD": [
+  [
+   "VS2102",
+   "Vardø"
+  ]
+ ],
+ "SRY": [
+  [
+   "VS1361",
+   "Skjervøy"
+  ]
+ ],
+ "TOS": [
+  [
+   "VS1417",
+   "Tromsø"
+  ]
+ ],
+ "RIN": [
+  [
+   "VS1195",
+   "Risøyhamn"
+  ]
+ ],
+ "HRD": [
+  [
+   "VS1198",
+   "Harstad"
+  ]
+ ],
+ "SRD": [
+  [
+   "VS1824",
+   "Sortland"
+  ]
+ ],
+ "SKN": [
+  [
+   "VS2103",
+   "Stokmarknes (E)"
+  ],
+  [
+   "VS1194",
+   "Stokmarknes (W)"
+  ]
+ ],
+ "SVJ": [
+  [
+   "VS2104",
+   "Svolvær"
+  ]
+ ],
+ "STU": [
+  [
+   "VS1515",
+   "Stamsund"
+  ]
+ ],
+ "BOO": [
+  [
+   "VS0691",
+   "Bodø"
+  ]
+ ],
+ "ORN": [
+  [
+   "VS1193",
+   "Ørnes"
+  ]
+ ],
+ "SSJ": [
+  [
+   "VS1246",
+   "Sandnessjøen"
+  ]
+ ],
+ "BNN": [
+  [
+   "VS1283",
+   "Brønnøysund"
+  ]
+ ],
+ "TRD": [
+  [
+   "VS1906",
+   "Trondheim"
+  ]
+ ],
+ "KSU": [
+  [
+   "VS1423",
+   "Kristiansund"
+  ]
+ ],
+ "MOL": [
+  [
+   "VS0660",
+   "Molde"
+  ]
+ ],
+ "AES": [
+  [
+   "VS1437",
+   "Ålesund (NW)"
+  ],
+  [
+   "VS1199",
+   "Ålesund (S)"
+  ]
+ ],
+ "FLO": [
+  [
+   "VS1373",
+   "Florø (N)"
+  ],
+  [
+   "VS1726",
+   "Florø (W)"
+  ]
+ ]
+}

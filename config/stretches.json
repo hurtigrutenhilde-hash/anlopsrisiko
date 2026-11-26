@@ -1,0 +1,50 @@
+{
+ "Stad": {
+  "lat": 62.2,
+  "lon": 5.05,
+  "N_after": "TVK",
+  "S_after": "MAL"
+ },
+ "Hustadvika": {
+  "lat": 63.0,
+  "lon": 7.05,
+  "N_after": "KSU",
+  "S_after": "MOL"
+ },
+ "Folla": {
+  "lat": 64.55,
+  "lon": 10.45,
+  "N_after": "RVK",
+  "S_after": "TRD"
+ },
+ "Vestfjorden": {
+  "lat": 67.7,
+  "lon": 14.0,
+  "N_after": "STU",
+  "S_after": "BOO"
+ },
+ "Lopphavet": {
+  "lat": 70.35,
+  "lon": 21.5,
+  "N_after": "OKD",
+  "S_after": "SRY"
+ },
+ "Sværholthavet": {
+  "lat": 71.15,
+  "lon": 26.6,
+  "N_after": "KJD",
+  "S_after": "HVG"
+ },
+ "Tanafjorden": {
+  "lat": 71.0,
+  "lon": 28.6,
+  "N_after": "BVG",
+  "S_after": "MEH"
+ },
+ "Syltefjord/Varanger": {
+  "lat": 70.6,
+  "lon": 30.6,
+  "N_after": "VRD",
+  "S_after": "BFJ"
+ }
+}

@@ -1,0 +1,66 @@
+[
+ {
+  "name": "Kong Harald",
+  "short": "K. Harald",
+  "mmsi": 257200000,
+  "doc": "NO-0041",
+  "ref_dir": "N",
+  "ref_start": "2026-11-21"
+ },
+ {
+  "name": "Nordkapp",
+  "short": "Nordkapp",
+  "mmsi": 259330000,
+  "doc": "NO-0041",
+  "ref_dir": "N",
+  "ref_start": "2026-11-25"
+ },
+ {
+  "name": "Nordlys",
+  "short": "Nordlys",
+  "mmsi": 259139000,
+  "doc": "NO-0041",
+  "ref_dir": "N",
+  "ref_start": "2026-11-24"
+ },
+ {
+  "name": "Nordnorge",
+  "short": "Nordnorge",
+  "mmsi": 259371000,
+  "doc": "NO-0041",
+  "ref_dir": "S",
+  "ref_start": "2026-11-25"
+ },
+ {
+  "name": "Polarlys",
+  "short": "Polarlys",
+  "mmsi": 259322000,
+  "doc": "NO-0040",
+  "ref_dir": "S",
+  "ref_start": "2026-11-22"
+ },
+ {
+  "name": "Richard With",
+  "short": "R. With",
+  "mmsi": 258500000,
+  "doc": "NO-0041",
+  "ref_dir": null,
+  "ref_start": null,
+  "out_of_service": {
+   "until": "2026-12-10",
+   "text": "Ute av drift til 10.12 (verksted)"
+  },
+  "fallback_pos": [
+   62.44139,
+   6.27965
+  ]
+ },
+ {
+  "name": "Vesterålen",
+  "short": "Vesterålen",
+  "mmsi": 258478000,
+  "doc": "NO-0044",
+  "ref_dir": "N",
+  "ref_start": "2026-11-22"
+ }
+]
