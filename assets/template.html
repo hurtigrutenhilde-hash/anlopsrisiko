@@ -3,7 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Anløpsrisiko">
+<meta name="theme-color" content="#000000">
 <title>Anløpsrisiko vind og sjø</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
@@ -99,12 +104,37 @@ tr.pwr th.sn{font-size:.85em;color:#c9ccd1}td.pwc{text-align:center;font-size:.8
 .ov h2{font-size:17px;margin:0 0 6px}.ov a{color:#74c0fc}.ov p,.ov li{margin:4px 0}
 .ov .x{float:right}
 @media(max-width:1000px),(max-aspect-ratio:4/3){body{overflow:auto;height:auto;display:block}main{grid-template-columns:minmax(0,1fr)}.board{overflow-x:auto}table{min-width:1100px;height:auto}td.c{height:44px}#map{max-height:none;max-width:340px}}
+
+#fBtn{display:none;font:inherit;min-height:30px;padding:0 12px;border-radius:15px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+@media (max-height:520px) and (orientation:landscape),(max-width:600px){
+ :root{--fs:11px}
+ body{display:block;overflow:auto;height:auto;padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+ header{padding:4px 8px;gap:6px;flex-wrap:nowrap}
+ h1{font-size:13px;flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .sub{display:none}
+ .kpis{flex-wrap:nowrap;overflow-x:auto;max-width:45vw;scrollbar-width:none}.kpis::-webkit-scrollbar{display:none}
+ .kpi{flex:none;min-height:26px;padding:2px 6px}
+ #fBtn{display:inline-block;flex:none}
+ .bar{display:none;padding:4px 8px}
+ body.fopen .bar{display:flex}
+ main{display:block;padding:4px 6px}
+ .board{max-height:calc(100dvh - 48px);overflow:auto;-webkit-overflow-scrolling:touch}
+ table{min-width:1150px;height:auto}
+ th.sn{position:sticky;left:0;z-index:3;box-shadow:1px 0 0 var(--line)}
+ tr.gh th .ghs{position:sticky;left:8px}
+ th.pn{font-size:.82em}
+ td.c{height:42px}
+ .side{margin-top:8px}
+ #map{max-height:80dvh;max-width:none}
+ .lgd{display:none}
+}
 </style>
 </head>
 <body>
 <header>
 <h1 id="h"></h1>
 <div class="kpis" id="kpis"></div>
+<button id="fBtn" aria-expanded="false">Filtre ▾</button>
 </header>
 <div class="bar" id="bar">
 <div class="grp" id="gHor"><span>Tidsrom</span></div>
@@ -427,7 +457,7 @@ function draw() {
   let h = `<colgroup><col class="sncol">${ports.map(() => "<col>").join("")}</colgroup>`;
   for (const d of dirs) {
     const order = d === "N" ? ports : [...ports].reverse();
-    h += `<tbody><tr class="gh"><th colspan="${ports.length+1}">${d==="N"?"Nordgående, Bergen → Kirkenes":"Sørgående, Kirkenes → Bergen"}</th></tr>`;
+    h += `<tbody><tr class="gh"><th colspan="${ports.length+1}"><span class="ghs">${d==="N"?"Nordgående, Bergen → Kirkenes":"Sørgående, Kirkenes → Bergen"}</span></th></tr>`;
     h += `<tr><th class="sn"></th>` + order.map(p => { const s2 = AFTER[d][p]; return `<th class="pn${s2?" st":""}" title="${esc(PN[p]+(s2?`, første havn etter ${s2}`:""))}"><span>${esc(PN[p])}</span></th>`; }).join("") + "</tr>";
     if (st.type === "all" || st.type === "wind") h += `<tr class="pwr"><th class="sn" title="Målt vind ved kai nå fra PortWind: middel og maks siste time i parentes">Målt nå</th>` + order.map(p => pwCell(p)).join("") + "</tr>";
     for (const [ship, short] of sh) {
@@ -477,6 +507,7 @@ $("fsBtn").addEventListener("click", async () => {
   catch (e) { $("reqNote").textContent = "Fullskjerm er ikke tillatt i denne visningen. Åpne siden i egen fane og prøv igjen, eller bruk F11."; }
 });
 document.addEventListener("fullscreenchange", () => { $("fsBtn").textContent = document.fullscreenElement ? "⛶ Avslutt fullskjerm" : "⛶ Fullskjerm"; });
+$("fBtn").addEventListener("click", () => { const o = document.body.classList.toggle("fopen"); $("fBtn").setAttribute("aria-expanded", o); $("fBtn").textContent = o ? "Filtre ▴" : "Filtre ▾"; });
 $("autoNote").textContent = `Oppdateres automatisk hver time · sist ${GENTXT}`;
 setInterval(async () => { try { const m = await fetch("meta.json", { cache:"no-store" }).then(r => r.json()); if (m.gen > GEN) location.reload(); } catch (e) {} }, 5*60e3);
 $("h").innerHTML = `${esc(HEAD)}<span class="sub">Hurtigruten kystruten · oppdatert ${GENTXT} · vind mot skipenes vindgrenser og bølger på åpne havstrekninger, 11 døgn fram · tallene følger filtrene</span>`;
