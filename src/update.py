@@ -46,7 +46,8 @@ def load(name):
 
 PORTS = load("ports.json")
 LIMS = load("limits.json")
-TT = load("timetable.json")
+SEAS = load("seasons.json")
+API_CODE = {"FRO": "FLO", "ORS": "ORN", "BJF": "BFJ"}
 STR = load("stretches.json")
 PWS = load("portwind_stations.json")
 SST0 = load("sst_fallback.json")
@@ -122,7 +123,78 @@ def voyage(lst, start):
     return out
 
 
+def fetch_seasons():
+    """Henter sesongruteplanene fra hurtigruten.com. Faller tilbake på lagret kopi."""
+    cache = CFG / "seasons_cache.json"
+    hdr = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36",
+           "Accept": "application/json", "Referer": "https://www.hurtigruten.com/nb-no/ruteplan"}
+    out = {"season_months": SEAS["season_months"], "N": {}, "S": {}}
+    try:
+        for d, dn in (("N", "northbound"), ("S", "southbound")):
+            for se in SEAS["season_months"]:
+                r = requests.get("https://www.hurtigruten.com/nellie-coastal-v2/api/sailing-plan",
+                                 params={"season": se, "direction": dn, "variants": "true"}, headers=hdr, timeout=30)
+                r.raise_for_status()
+                lst = []
+                for x in r.json():
+                    v = x.get("variant") or {}
+                    hm = lambda s: s[11:16] if s else None
+                    lst.append([API_CODE.get(x["currentPortCode"], x["currentPortCode"]), hm(x.get("arrivalDateTime")),
+                                hm(x.get("departureDateTime")), v.get("groupId"), v.get("branchId"), v.get("months"),
+                                [[q["from"][5:10], q["to"][5:10]] for q in v.get("departureRanges") or []] or None])
+                if len(lst) < 20:
+                    raise ValueError(f"for få anløp i {se} {dn}")
+                out[d][se] = lst
+        out["source"] = "hurtigruten.com " + NOW.astimezone(OSLO).strftime("%d.%m.%Y %H:%M")
+        cache.write_text(json.dumps(out, ensure_ascii=False), encoding="utf-8")
+        return out
+    except Exception as e:
+        WARN.append(f"Ruteplan fra hurtigruten.com feilet ({e}): bruker lagret ruteplan.")
+        if cache.exists():
+            try:
+                return json.loads(cache.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+        return SEAS
+
+
+def season_of(day, seas):
+    for se, months in seas["season_months"].items():
+        if day.month in months:
+            return se
+    return "winter"
+
+
+def timetable_for(d, day, seas):
+    """Ruteplan for en seilas som starter (Bergen N / Kirkenes S) på datoen day, med riktige varianter."""
+    lst = seas[d][season_of(day, seas)]
+    md = day.strftime("%m-%d")
+    chosen = {}
+    groups = {}
+    for c, a, dd, g, b, months, ranges in lst:
+        if g:
+            groups.setdefault(g, {})[b] = (months or [], ranges or [])
+    for g, br in groups.items():
+        pick = next((b for b, (m, r) in br.items() if any(f <= md <= t for f, t in r)), None)
+        pick = pick or next((b for b, (m, r) in br.items() if (day.month - 1) in m), None)
+        chosen[g] = pick or next(iter(br))
+    return [[c, a, dd] for c, a, dd, g, b, m, r in lst if not g or chosen.get(g) == b]
+
+
+def merge_detours(v):
+    """Fjordavstikkere (Geiranger, Hjørundfjorden) vises som ett anløp i Ålesund: første ankomst, siste avgang."""
+    v = [x for x in v if x[0] in PORTS]
+    out = []
+    for c, a, d in v:
+        if out and out[-1][0] == c:
+            out[-1] = (c, out[-1][1], d)
+        else:
+            out.append((c, a, d))
+    return out
+
+
 def schedule():
+    seas = fetch_seasons()
     calls = []
     for s in SHIPS:
         if not s.get("ref_dir") or not s.get("ref_start"):
@@ -140,7 +212,7 @@ def schedule():
             st = st + dt.timedelta(days=6 if d == "N" else 5)
             d = "S" if d == "N" else "N"
         for d, st in legs:
-            v = voyage(TT[d], st)
+            v = merge_detours(voyage(timetable_for(d, st, seas), st))
             for k, (c, a, dd) in enumerate(v):
                 t0, t1 = a or dd, dd or a
                 if t1 >= NOWMS and t0 <= ms(END):
@@ -594,6 +666,10 @@ def main():
     (SITE / "meta.json").write_text(json.dumps(dict(gen=gen, txt=gtxt, rows=len(rows), warnings=WARN), ensure_ascii=False),
                                     encoding="utf-8")
     (SITE / ".nojekyll").write_text("")
+    import shutil
+    for f in ("manifest.webmanifest", "icon-192.png", "icon-512.png"):
+        if (ASSETS / f).exists():
+            shutil.copy(ASSETS / f, SITE / f)
     (SITE / "robots.txt").write_text("User-agent: *\nDisallow: /\n")
     print(f"Ferdig: {len(rows)} rader. {gtxt}", flush=True)
     for w in WARN:
