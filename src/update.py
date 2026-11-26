@@ -594,6 +594,7 @@ def main():
     (SITE / "meta.json").write_text(json.dumps(dict(gen=gen, txt=gtxt, rows=len(rows), warnings=WARN), ensure_ascii=False),
                                     encoding="utf-8")
     (SITE / ".nojekyll").write_text("")
+    (SITE / "robots.txt").write_text("User-agent: *\nDisallow: /\n")
     print(f"Ferdig: {len(rows)} rader. {gtxt}", flush=True)
     for w in WARN:
         print("ADVARSEL:", w, flush=True)
