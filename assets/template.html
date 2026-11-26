@@ -9,6 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Anløpsrisiko">
 <meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Anløpsrisiko vind og sjø</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
@@ -142,7 +145,7 @@ tr.pwr th.sn{font-size:.85em;color:#c9ccd1}td.pwc{text-align:center;font-size:.8
 <div class="grp" id="gShip"><span>Skip</span></div>
 <div class="grp"><span>Retning</span><button id="dN">Nordgående</button><button id="dS">Sørgående</button></div>
 <div class="grp"><button id="onlyDev">Bare avvik</button><button id="btnWatch">Følg med på</button><button id="btnAbout">Om dataene</button></div>
-<div class="grp"><span id="autoNote" class="autonote"></span><button id="fsBtn" aria-label="Fullskjerm">⛶ Fullskjerm</button><span id="reqNote" role="status"></span></div>
+<div class="grp"><span id="autoNote" class="autonote"></span><button id="updLocal" class="pri" hidden>Oppdater data</button><button id="fsBtn" aria-label="Fullskjerm">⛶ Fullskjerm</button><span id="reqNote" role="status"></span></div>
 </div>
 <main>
 <div class="board"><table id="tbl"></table></div>
@@ -171,7 +174,7 @@ tr.pwr th.sn{font-size:.85em;color:#c9ccd1}td.pwc{text-align:center;font-size:.8
 <div class="mapov" id="mapov" role="dialog" aria-label="Stort kart"><div class="top"><b id="mapovT">Skipenes posisjon</b><div class="anim" style="flex:1;max-width:640px"><button id="play2" aria-label="Spill av">▶</button><input type="range" id="tl2" min="0" max="72" step="0.25" value="0" aria-label="Tid fram i tid"><select id="spd2" class="spd" aria-label="Hastighet"><option value="1">1 t/s</option><option value="3" selected>3 t/s</option><option value="6">6 t/s</option><option value="12">12 t/s</option></select><span class="tlab" id="tlab2"></span></div><button id="mapClose">Lukk</button></div><div class="mwrap big"><div class="zb" data-m="b"><button data-z="in" aria-label="Zoom inn">+</button><button data-z="out" aria-label="Zoom ut">−</button><button data-z="reset" aria-label="Hele kysten">⟲</button></div><svg id="map2" class="mp" viewBox="0 0 __MW__ __MH__" preserveAspectRatio="xMidYMid meet"></svg></div>
 <template id="about">
 <h2>Om dataene</h2>
-<p><b>Skipenes posisjon:</b> AIS fra Kystverket via BarentsWatch, vist med tidspunktet for siste posisjon. Siden oppdateres automatisk omtrent hver time: posisjoner, målt vind, værvarsel, bølger og ising hentes på nytt og tabellen beregnes på nytt. Avspillingen i kartet viser forventet posisjon de neste 72 timene, langs beregnede sjøruter mellom havnene etter ruteplanen (korteste vei gjennom sjø på et rutenett over kystlinjen, ikke faktisk lei), med symbolene for anløpet skipet er på vei inn til eller ligger i. Kommende anløp i tabellen er beregnet fra vinterruteplanen på hurtigruten.com. Forsinkelser utover ruteplanen er ikke modellert.</p>
+<p><b>Skipenes posisjon:</b> AIS fra Kystverket via BarentsWatch, vist med tidspunktet for siste posisjon. Siden oppdateres automatisk omtrent hver time: posisjoner, målt vind, værvarsel, bølger og ising hentes på nytt og tabellen beregnes på nytt. Avspillingen i kartet viser forventet posisjon de neste 72 timene, langs beregnede sjøruter mellom havnene etter ruteplanen (korteste vei gjennom sjø på et rutenett over kystlinjen, ikke faktisk lei), med symbolene for anløpet skipet er på vei inn til eller ligger i. Kommende anløp i tabellen er beregnet fra sesongruteplanene på hurtigruten.com (vinter, vår, sommer og høst), som hentes på nytt ved hver oppdatering. For hver seilas velges ruteplanen for avgangsdatoen fra Bergen eller Kirkenes, med riktige varianter innenfor sesongen. Avstikkere til Hjørundfjorden og Geirangerfjorden vises som ett anløp i Ålesund, fra første ankomst til siste avgang, og kartet viser skipet i Ålesund mens det er inne i fjorden. Forsinkelser utover ruteplanen er ikke modellert.</p>
 <p><b>Vindgrenser:</b> UniSea IMS NO-0041 (Kong Harald, Richard With, Nordlys, Nordnorge, Nordkapp), NO-0040 (Polarlys) og NO-0044 (Vesterålen), per havn og vindretning. Grensene gjelder skipets vindmåler, og kaptein eller overstyrmann avgjør anløpet (NO-0128).</p>
 <p><b>Vind de første 72 timene:</b> MET Norway Locationforecast 2.0 (samme data som yr.no) ved kaien. Middelvind, kast og 90-persentil i vinduet fra én time før ankomst til avgang, målt mot grensen for varslet retning.</p>
 <p><b>Vind dag 4–11:</b> ECMWF IFS ensemble (51 medlemmer, 0,25°, via Open-Meteo). Hvert medlems sterkeste vind ±6 timer rundt anløpet mot grensen for medlemmets retning. Mulig sterk vind: minst 15 % av medlemmene over 85 % av grensen. Sannsynlig: minst 25 % over grensen eller 40 % over 85 %. Rutepunktene ligger 3–21 km fra kaien.</p>
@@ -509,6 +512,29 @@ $("fsBtn").addEventListener("click", async () => {
 document.addEventListener("fullscreenchange", () => { $("fsBtn").textContent = document.fullscreenElement ? "⛶ Avslutt fullskjerm" : "⛶ Fullskjerm"; });
 $("fBtn").addEventListener("click", () => { const o = document.body.classList.toggle("fopen"); $("fBtn").setAttribute("aria-expanded", o); $("fBtn").textContent = o ? "Filtre ▴" : "Filtre ▾"; });
 $("autoNote").textContent = `Oppdateres automatisk hver time · sist ${GENTXT}`;
+(async () => {
+  let s; try { const r = await fetch("api/status", { cache:"no-store" }); if (!r.ok) return; s = await r.json(); } catch (e) { return; }
+  const b = $("updLocal"), note = $("autoNote");
+  b.hidden = false; note.textContent = `Oppdateres hver time mens appen kjører · sist ${GENTXT}`;
+  const poll = async () => {
+    for (;;) {
+      await new Promise(r => setTimeout(r, 3000));
+      let st; try { st = await fetch("api/status", { cache:"no-store" }).then(r => r.json()); } catch (e) { continue; }
+      if (!st.running) {
+        if (st.ok) { location.reload(); return; }
+        b.disabled = false; b.textContent = "Oppdater data";
+        note.textContent = st.ok ? `Ingen nye data · sist ${GENTXT}` : "Oppdateringen feilet. Se vinduet der appen kjører.";
+        return;
+      }
+    }
+  };
+  b.addEventListener("click", async () => {
+    b.disabled = true; b.textContent = "Oppdaterer …"; note.textContent = "Henter AIS, målt vind, varsler, bølger og ising (1–2 min)";
+    try { await fetch("api/update", { method:"POST" }); } catch (e) {}
+    poll();
+  });
+  if (s.running) { b.disabled = true; b.textContent = "Oppdaterer …"; poll(); }
+})();
 setInterval(async () => { try { const m = await fetch("meta.json", { cache:"no-store" }).then(r => r.json()); if (m.gen > GEN) location.reload(); } catch (e) {} }, 5*60e3);
 $("h").innerHTML = `${esc(HEAD)}<span class="sub">Hurtigruten kystruten · oppdatert ${GENTXT} · vind mot skipenes vindgrenser og bølger på åpne havstrekninger, 11 døgn fram · tallene følger filtrene</span>`;
 drawMap();
