@@ -585,6 +585,9 @@ def main():
     for k in ["__GENTXT__", "__GEN__", "__OFF__", "__AIST__", "__AIS__", "__PWD__", "__HEAD__", "__MP__", "__DATA__",
               "__MW__", "__MH__"]:
         t = t.replace(k, rep[k])
+    if ships and all(v.get("estimated") for v in ships.values()):
+        t = t.replace('AIS fra BarentsWatch ${fdate(AIST)} kl. ${hm(AIST)} (${age < 120 ? age + " min" : Math.round(age/60) + " t"} siden)',
+                      "Ingen AIS ennå (BarentsWatch-nøkkel mangler): skipene er vist ved havnen etter ruteplanen")
     SITE.mkdir(exist_ok=True)
     (SITE / "index.html").write_text(t, encoding="utf-8")
     (SITE / "state.json").write_text(json.dumps(dict(positions=pos, portwind=pw), ensure_ascii=False), encoding="utf-8")
